@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Ravens: Pre-Consultation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: pop-in 0.3s forwards ease-out;
+        }
+        .ai-bubble {
+            background-color: #ffffff;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .user-bubble {
+            background-color: #3b82f6;
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9ca3af;
+            animation: bounce 1.3s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+        @keyframes pop-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+             opacity: 0;
+             animation: pop-in 0.5s forwards ease-out;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+
+    <div class="w-full max-w-md h-[90vh] md:h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col">
+        
+        <!-- Header -->
+        <header class="p-4 border-b border-gray-200 text-center bg-gray-50 rounded-t-2xl">
+            <h1 class="text-xl font-bold text-gray-800">The Stanmore Clinic</h1>
+            <p class="text-sm text-gray-500">Pre-Consultation with Dr. Evans</p>
+        </header>
+
+        <!-- Chat Messages -->
+        <main id="chat-messages" class="flex-1 p-6 overflow-y-auto bg-gray-100">
+            <div id="message-container" class="space-y-4">
+                <!-- Messages will be injected here by JavaScript -->
+            </div>
+            <div id="typing-indicator" class="chat-bubble ai-bubble typing-indicator hidden">
+                <span></span><span></span><span></span>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="p-4 bg-white border-t border-gray-200 rounded-b-2xl">
+            <div class="flex items-center space-x-3">
+                <input type="text" id="user-input" class="flex-1 w-full px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
+                <button id="send-btn" class="p-3 bg-blue-500 rounded-full text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                </button>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageContainer = document.getElementById('message-container');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            let currentStep = 0;
+            const conversationFlow = [
+                { type: 'ai', text: "Hi Sarah. I'm a smart assistant for The Stanmore Clinic. I'm here to help gather your story so Dr. Evans can focus on you during your appointment. In your own words, what's been troubling you?", placeholder: "I've been feeling tired..." },
+                { type: 'user', text: "I just feel so tired all the time. And I've been getting dizzy spells and my head feels really foggy, especially at work." },
+                { type: 'ai', text: "Thank you for sharing that, Sarah. It sounds very frustrating. Could you tell me a bit more about the tiredness? For example, when did you first notice it and is it there every day?", placeholder: "It started about 6 months ago..." },
+                { type: 'user', text: "It started around 6-8 months ago, and yes, the tiredness is pretty much constant every day. It doesn't seem to get better even with a good night's sleep." },
+                { type: 'ai', text: "That's very clear. To get a full picture, I'd like to ask about a few other things. In the last few months, have you noticed any changes in your sleep patterns or mood?", placeholder: "Yes, my sleep is terrible..." },
+                { type: 'user', text: "Actually yes, my sleep has been terrible. I keep waking up in the night feeling really hot and sweaty." },
+                { type: 'ai', text: "Thank you for letting me know. And what about your monthly cycle, has there been any change in its regularity or flow?", placeholder: "It's been irregular..." },
+                { type: 'user', text: "It's definitely become irregular over the past year or so." },
+                { type: 'ai', text: "Thanks, Sarah. This has been incredibly helpful. I have a great summary for Dr. Evans to review. We look forward to seeing you tomorrow at 10:30 AM. There's nothing more you need to do.", final: true }
+            ];
+
+            function addMessage(text, sender) {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${sender}-bubble`;
+                bubble.innerHTML = text.replace(/\n/g, '<br>'); // Support newlines
+                messageContainer.appendChild(bubble);
+                messageContainer.parentElement.scrollTop = messageContainer.parentElement.scrollHeight;
+            }
+
+            function showTyping() {
+                typingIndicator.classList.remove('hidden');
+                messageContainer.parentElement.scrollTop = messageContainer.parentElement.scrollHeight;
+            }
+
+            function hideTyping() {
+                typingIndicator.classList.add('hidden');
+            }
+            
+            function nextStep() {
+                if (currentStep >= conversationFlow.length) return;
+
+                const step = conversationFlow[currentStep];
+                
+                if (step.type === 'ai') {
+                    showTyping();
+                    setTimeout(() => {
+                        hideTyping();
+                        addMessage(step.text, 'ai');
+                        userInput.placeholder = step.placeholder || "Type your message...";
+                        if (step.final) {
+                            userInput.disabled = true;
+                            sendBtn.disabled = true;
+                            userInput.placeholder = "Conversation complete";
+                        }
+                    }, 1500);
+                }
+                currentStep++;
+            }
+
+            function handleSend() {
+                const text = userInput.value.trim();
+                if (!text && currentStep < conversationFlow.length && conversationFlow[currentStep].type === 'user') {
+                     // If input is empty, use the pre-scripted user response
+                    addMessage(conversationFlow[currentStep].text, 'user');
+                } else if (text) {
+                    addMessage(text, 'user');
+                } else {
+                    return;
+                }
+                
+                userInput.value = '';
+                nextStep(); // Advance to the AI's response
+                setTimeout(nextStep, 100); // Trigger the next AI step
+            }
+
+            sendBtn.addEventListener('click', handleSend);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSend();
+                }
+            });
+
+            // Start the conversation
+            setTimeout(nextStep, 500);
+        });
+    </script>
+</body>
+</html>
