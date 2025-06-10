@@ -19,13 +19,16 @@
             height: 100%;
         }
         .chat-bubble {
-            max-width: 80%;
+            max-width: 85%;
             padding: 12px 16px;
             border-radius: 20px;
             margin-bottom: 8px;
             opacity: 0;
             transform: translateY(20px);
             animation: pop-in 0.3s forwards ease-out;
+            line-height: 1.6;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         .ai-bubble {
             background-color: #ffffff;
@@ -47,56 +50,50 @@
             background-color: #9ca3af;
             animation: bounce 1.3s infinite;
         }
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+        @keyframes pop-in { to { opacity: 1; transform: translateY(0); } }
+        
+        #input-container-wrapper {
+            transition: opacity 0.3s ease-out;
         }
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
+        .mic-button.is-listening {
+            background-color: #ef4444;
+            animation: pulse 1.5s infinite;
         }
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-6px); }
-        }
-        @keyframes pop-in {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fade-in {
-             opacity: 0;
-             animation: pop-in 0.5s forwards ease-out;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
 
-    <div class="w-full max-w-md h-[90vh] md:h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col">
+    <div class="w-full max-w-md h-[95vh] md:h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col">
         
-        <!-- Header -->
-        <header class="p-4 border-b border-gray-200 text-center bg-gray-50 rounded-t-2xl">
+        <header class="p-4 border-b border-gray-200 text-center bg-gray-50 rounded-t-2xl flex-shrink-0">
             <h1 class="text-xl font-bold text-gray-800">The Stanmore Clinic</h1>
             <p class="text-sm text-gray-500">Pre-Consultation with Dr. Evans</p>
         </header>
 
-        <!-- Chat Messages -->
         <main id="chat-messages" class="flex-1 p-6 overflow-y-auto bg-gray-100">
             <div id="message-container" class="space-y-4">
-                <!-- Messages will be injected here by JavaScript -->
             </div>
-            <div id="typing-indicator" class="chat-bubble ai-bubble typing-indicator hidden">
-                <span></span><span></span><span></span>
+            <div id="typing-indicator" class="chat-bubble ai-bubble hidden">
+                <div class="typing-indicator"><span></span><span></span><span></span></div>
             </div>
         </main>
 
-        <!-- Input Area -->
-        <footer class="p-4 bg-white border-t border-gray-200 rounded-b-2xl">
-            <div class="flex items-center space-x-3">
-                <input type="text" id="user-input" class="flex-1 w-full px-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
-                <button id="send-btn" class="p-3 bg-blue-500 rounded-full text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform active:scale-95">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
+        <footer id="input-area" class="p-4 bg-white border-t border-gray-200 rounded-b-2xl flex-shrink-0">
+            <div id="input-container-wrapper" class="flex items-end space-x-3">
+                <textarea id="user-input" rows="1" class="flex-1 w-full px-4 py-2 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type or tap the mic to talk..."></textarea>
+                <button id="mic-btn" class="mic-button p-3 bg-gray-600 rounded-full text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                </button>
+                <button id="send-btn" class="p-3 bg-blue-500 rounded-full text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform active:scale-95 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                 </button>
             </div>
         </footer>
@@ -109,83 +106,175 @@
             const typingIndicator = document.getElementById('typing-indicator');
             const userInput = document.getElementById('user-input');
             const sendBtn = document.getElementById('send-btn');
-
-            let currentStep = 0;
-            const conversationFlow = [
-                { type: 'ai', text: "Hi Sarah. I'm a smart assistant for The Stanmore Clinic. I'm here to help gather your story so Dr. Evans can focus on you during your appointment. In your own words, what's been troubling you?", placeholder: "I've been feeling tired..." },
-                { type: 'user', text: "I just feel so tired all the time. And I've been getting dizzy spells and my head feels really foggy, especially at work." },
-                { type: 'ai', text: "Thank you for sharing that, Sarah. It sounds very frustrating. Could you tell me a bit more about the tiredness? For example, when did you first notice it and is it there every day?", placeholder: "It started about 6 months ago..." },
-                { type: 'user', text: "It started around 6-8 months ago, and yes, the tiredness is pretty much constant every day. It doesn't seem to get better even with a good night's sleep." },
-                { type: 'ai', text: "That's very clear. To get a full picture, I'd like to ask about a few other things. In the last few months, have you noticed any changes in your sleep patterns or mood?", placeholder: "Yes, my sleep is terrible..." },
-                { type: 'user', text: "Actually yes, my sleep has been terrible. I keep waking up in the night feeling really hot and sweaty." },
-                { type: 'ai', text: "Thank you for letting me know. And what about your monthly cycle, has there been any change in its regularity or flow?", placeholder: "It's been irregular..." },
-                { type: 'user', text: "It's definitely become irregular over the past year or so." },
-                { type: 'ai', text: "Thanks, Sarah. This has been incredibly helpful. I have a great summary for Dr. Evans to review. We look forward to seeing you tomorrow at 10:30 AM. There's nothing more you need to do.", final: true }
+            const micBtn = document.getElementById('mic-btn');
+            
+            let chatHistory = [];
+            let isListening = false;
+            let simulatedResponseIndex = 0;
+            
+            const simulatedVoiceResponses = [
+                "I just feel so tired all the time, and my head feels foggy.",
+                "It started around 6-8 months ago.",
+                "I'd say a 7 out of 10. It's pretty constant.",
+                "No, that's the strange thing. It doesn't seem to get better even with a good night's sleep.",
+                "It's mainly difficulty with concentration at work, and sometimes finding the right word when I'm talking.",
+                "Yes, my sleep has been terrible. I keep waking up in the night feeling really hot and sweaty.",
+                "Yes, I've been more anxious.",
+                "Yes, it's become irregular.",
+                "No, I haven't had that.",
+                "No, nothing like that.",
+                "Just Ibuprofen sometimes for headaches.",
+                "Yes, I get a rash with Penicillin."
             ];
+
+            const systemPrompt = `You are a friendly and empathetic AI assistant for a medical clinic called 'The Stanmore Clinic'. 
+            Your name is not important. Your goal is to take a detailed patient history before their appointment with a doctor.
+            The patient's name is Sarah.
+            1.  Start by greeting the patient and explaining your purpose clearly. Ask them to describe what's troubling them in their own words.
+            2.  After their initial description, ask clarifying questions about their main symptoms one by one. Ask about onset, duration, severity, and any triggers.
+            3.  After exploring the main complaints, conduct a brief but systematic review of other systems to ensure nothing is missed. Ask about sleep, mood, and other general health indicators. Ask one question at a time.
+            4.  Finally, ask about current medications and allergies.
+            5.  Keep your responses concise and conversational. Do not provide any medical advice, diagnosis, or treatment recommendations.
+            6.  Once you believe you have a good summary, conclude the conversation politely, confirming their appointment details (with Dr. Evans tomorrow at 10:30 AM).`;
 
             function addMessage(text, sender) {
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${sender}-bubble`;
-                bubble.innerHTML = text.replace(/\n/g, '<br>'); // Support newlines
+                bubble.innerHTML = text.replace(/\n/g, '<br>');
                 messageContainer.appendChild(bubble);
-                messageContainer.parentElement.scrollTop = messageContainer.parentElement.scrollHeight;
+                scrollToBottom();
+            }
+            
+            function scrollToBottom() {
+                 messageContainer.parentElement.scrollTop = messageContainer.parentElement.scrollHeight;
             }
 
             function showTyping() {
                 typingIndicator.classList.remove('hidden');
-                messageContainer.parentElement.scrollTop = messageContainer.parentElement.scrollHeight;
+                scrollToBottom();
             }
 
             function hideTyping() {
                 typingIndicator.classList.add('hidden');
             }
             
-            function nextStep() {
-                if (currentStep >= conversationFlow.length) return;
+            function disableInput(message = "Type your message...") {
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                micBtn.disabled = true;
+                userInput.placeholder = message;
+            }
 
-                const step = conversationFlow[currentStep];
+            function enableInput(message = "Type or tap the mic to talk...") {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                micBtn.disabled = false;
+                userInput.placeholder = message;
+                userInput.focus();
+            }
+
+            async function getGeminiResponse() {
+                showTyping();
+                disableInput("AI is thinking...");
+
+                const payload = {
+                    contents: chatHistory,
+                };
                 
-                if (step.type === 'ai') {
-                    showTyping();
-                    setTimeout(() => {
-                        hideTyping();
-                        addMessage(step.text, 'ai');
-                        userInput.placeholder = step.placeholder || "Type your message...";
-                        if (step.final) {
-                            userInput.disabled = true;
-                            sendBtn.disabled = true;
-                            userInput.placeholder = "Conversation complete";
-                        }
-                    }, 1500);
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    let aiResponseText = "Sorry, I encountered a problem. Could you please rephrase?";
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        aiResponseText = result.candidates[0].content.parts[0].text;
+                    }
+                    
+                    hideTyping();
+                    addMessage(aiResponseText, 'ai');
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+                    enableInput();
+
+                } catch (error) {
+                    hideTyping();
+                    addMessage("I'm having trouble connecting right now. Please try again in a moment.", 'ai');
+                    enableInput();
                 }
-                currentStep++;
             }
 
             function handleSend() {
                 const text = userInput.value.trim();
-                if (!text && currentStep < conversationFlow.length && conversationFlow[currentStep].type === 'user') {
-                     // If input is empty, use the pre-scripted user response
-                    addMessage(conversationFlow[currentStep].text, 'user');
-                } else if (text) {
-                    addMessage(text, 'user');
-                } else {
-                    return;
-                }
+                if (!text) return;
+
+                addMessage(text, 'user');
+                chatHistory.push({ role: "user", parts: [{ text: text }] });
                 
                 userInput.value = '';
-                nextStep(); // Advance to the AI's response
-                setTimeout(nextStep, 100); // Trigger the next AI step
+                adjustTextareaHeight();
+                
+                getGeminiResponse();
+            }
+            
+            function adjustTextareaHeight() {
+                userInput.style.height = 'auto';
+                userInput.style.height = (userInput.scrollHeight) + 'px';
             }
 
+            function handleMicClick() {
+                if(isListening) {
+                    isListening = false;
+                    micBtn.classList.remove('is-listening');
+                    enableInput();
+                } else {
+                    isListening = true;
+                    micBtn.classList.add('is-listening');
+                    disableInput("Listening... (simulated)");
+                    
+                    setTimeout(() => {
+                        const simulatedTranscription = simulatedVoiceResponses[simulatedResponseIndex] || "I'm not sure what to say.";
+                        simulatedResponseIndex++;
+                        
+                        userInput.value = simulatedTranscription;
+                        adjustTextareaHeight();
+                        micBtn.classList.remove('is-listening');
+                        isListening = false;
+                        enableInput();
+                        setTimeout(handleSend, 500); 
+                    }, 2500);
+                }
+            }
+
+            userInput.addEventListener('input', adjustTextareaHeight);
             sendBtn.addEventListener('click', handleSend);
-            userInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
+            micBtn.addEventListener('click', handleMicClick);
+            
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
                     handleSend();
                 }
             });
 
-            // Start the conversation
-            setTimeout(nextStep, 500);
+            function startConversation() {
+                chatHistory.push({ role: "user", parts: [{ text: systemPrompt }] });
+                getGeminiResponse();
+            }
+            
+            startConversation();
         });
     </script>
 </body>
